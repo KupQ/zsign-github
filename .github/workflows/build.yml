@@ -1,0 +1,39 @@
+name: Compile zsign
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zip unzip build-essential checkinstall zlib1g-dev wget g++
+
+    - name: Download and Install the latest OpenSSL
+      run: |
+        # Find the latest version of OpenSSL
+        LATEST_VERSION=$(wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1.1.1f-1ubuntu2.\K\d+' | sort -Vr | head -n 1)
+
+        # Construct download URLs
+        OPENSSL_URL="http://security.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb"
+        LIBSSL_DEV_URL="http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl-dev_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb"
+        LIBSSL_URL="http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb"
+
+        # Download and install the packages
+        wget $OPENSSL_URL
+        wget $LIBSSL_DEV_URL
+        wget $LIBSSL_URL
+        sudo dpkg -i openssl_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb libssl-dev_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb libssl1.1_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb
+
+    - name: Compile zsign
+      run: |
+        g++ *.cpp common/*.cpp -std=gnu++11 -lcrypto -O3 -o zsign
