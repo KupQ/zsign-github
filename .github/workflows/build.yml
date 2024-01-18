@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-apt install -y zip unzip build-essential checkinstall zlib1g-dev wget g++ cmake make checkinstall zlib1g-dev libssl-dev openssl
+        sudo apt-get install -y zip unzip build-essential checkinstall zlib1g-dev wget g++ cmake make checkinstall zlib1g-dev libssl-dev openssl
         
     - name: Download and Install the latest OpenSSL
       run: |
