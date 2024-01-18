@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
@@ -64,13 +64,6 @@ jobs:
         # Install the packages
         sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-confnew $OPENSSL_DEB $LIBSSL_DEV_DEB $LIBSSL_DEB
 
-    - name: Find OpenSSL Header
-      id: find-openssl-header
-      run: |
-        HEADER_PATH=$(find /usr/include -name 'ssl.h' 2>/dev/null | head -n 1)
-        HEADER_DIR=$(dirname "$HEADER_PATH")
-        echo "HEADER_DIR=$HEADER_DIR" >> $GITHUB_ENV
-
     - name: Compile zsign
       run: |
-        g++ *.cpp common/*.cpp -I${HEADER_DIR} -lcrypto -O3 -o zsign
+        g++ *.cpp common/*.cpp -lcrypto -O3 -o zsign
