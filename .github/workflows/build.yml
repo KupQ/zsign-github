@@ -78,4 +78,7 @@ jobs:
     
     - name: Compile zsign
       run: |
-        g++ *.cpp common/*.cpp -I${HEADER_DIR} -lcrypto -O3 -o zsign
+        mkdir build
+        cd build
+        cmake ..
+        make
