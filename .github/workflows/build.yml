@@ -72,3 +72,8 @@ jobs:
         ./config
         make
         sudo make install
+        
+    - name: Compile zsign
+      run: |
+        g++ *.cpp common/*.cpp -lcrypto -O3 -o zsign
+
