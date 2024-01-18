@@ -24,8 +24,14 @@ jobs:
 
     - name: Download and Install the latest OpenSSL
       run: |
-        # Extract the latest version number more accurately
-        VERSION=$(wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1\.1\.1f-1ubuntu2\.\K\d+(?=_amd64\.deb)' | sort -V | tail -n 1)
+        # Fetch the page and extract the version numbers
+        wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1\.1\.1f-1ubuntu2\.\K\d+(?=_amd64\.deb)' > versions.txt
+    
+        # Sort the versions and get the latest
+        VERSION=$(sort -V versions.txt | tail -n 1)
+    
+        # Clean up the temporary file
+        rm versions.txt
     
         # Ensure that a version number was found
         if [ -z "$VERSION" ]; then
@@ -44,6 +50,7 @@ jobs:
             wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb"
         fi
         sudo dpkg -i openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb
+    
 
     - name: Compile zsign
       run: |
