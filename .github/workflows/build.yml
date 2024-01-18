@@ -13,6 +13,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Cache OpenSSL
+      uses: actions/cache@v2
+      with:
+        path: |
+          /path/to/openssl/cache
+          /another/path/if/needed
+        key: ${{ runner.os }}-openssl-${{ hashFiles('**/file-to-hash-for-cache-key') }}
+        restore-keys: |
+          ${{ runner.os }}-openssl-
+
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -20,7 +30,7 @@ jobs:
 
     - name: Download and Install the latest OpenSSL
       run: |
-        # Find the latest version of OpenSSL
+        # Add logic to check if cached OpenSSL exists
         LATEST_VERSION=$(wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1.1.1f-1ubuntu2.\K\d+' | sort -Vr | head -n 1)
 
         # Construct download URLs
@@ -37,3 +47,7 @@ jobs:
     - name: Compile zsign
       run: |
         g++ *.cpp common/*.cpp -std=gnu++11 -lcrypto -O3 -o zsign
+
+
+
+
