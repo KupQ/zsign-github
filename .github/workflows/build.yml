@@ -64,16 +64,16 @@ jobs:
         # Install the packages
         sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-confnew $OPENSSL_DEB $LIBSSL_DEV_DEB $LIBSSL_DEB
 
-      - name: Find OpenSSL Header
-        id: find-openssl-header
-        run: |
-          HEADER_PATH=$(find /usr/include /usr/local/include -name 'provider.h' -print -quit)
-          if [ -z "$HEADER_PATH" ]; then
-              echo "provider.h not found"
-              exit 1
-          fi
-          HEADER_DIR=$(dirname "$HEADER_PATH")
-          echo "HEADER_DIR=$HEADER_DIR" >> $GITHUB_ENV
+    - name: Find OpenSSL Header
+      id: find-openssl-header
+      run: |
+        HEADER_PATH=$(find /usr/include /usr/local/include -name 'provider.h' -print -quit)
+        if [ -z "$HEADER_PATH" ]; then
+            echo "provider.h not found"
+            exit 1
+        fi
+        HEADER_DIR=$(dirname "$HEADER_PATH")
+        echo "HEADER_DIR=$HEADER_DIR" >> $GITHUB_ENV
 
     
     - name: Compile zsign
