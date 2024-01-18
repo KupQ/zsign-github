@@ -59,11 +59,7 @@ jobs:
         fi
     
         # Install the packages
-        sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-confnew $OPENSSL_DEB $LIBSSL_DEV_DEB $LIBSSL_DEB
-
-    - name: Configure zsign
-      run: |
-        ./configure --with-openssl=/usr
+        sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-confnew $OPENSSL_DEB $LIBSSL_DEB
 
     - name: Compile zsign
       run: |
