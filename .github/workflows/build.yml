@@ -22,25 +22,26 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-openssl-
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y zip unzip build-essential checkinstall zlib1g-dev wget g++
-
     - name: Download and Install the latest OpenSSL
       run: |
-        # Extract the latest version number
-        VERSION=$(wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1.1.1f-1ubuntu2.\K\d+' | sort -V | tail -n 1)
-
+        # Extract the latest version number more accurately
+        VERSION=$(wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1\.1\.1f-1ubuntu2\.\K\d+(?=_amd64\.deb)' | sort -V | tail -n 1)
+    
+        # Ensure that a version number was found
+        if [ -z "$VERSION" ]; then
+          echo "Failed to find the latest OpenSSL version."
+          exit 1
+        fi
+    
         # Check if cached .deb files exist, if not download them
         if [ ! -f "openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb" ]; then
-            wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb
+            wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb"
         fi
         if [ ! -f "libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb" ]; then
-            wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb
+            wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb"
         fi
         if [ ! -f "libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb" ]; then
-            wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb
+            wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb"
         fi
         sudo dpkg -i openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb
 
