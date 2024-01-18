@@ -17,9 +17,8 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          /path/to/openssl/cache
-          /another/path/if/needed
-        key: ${{ runner.os }}-openssl-${{ hashFiles('**/file-to-hash-for-cache-key') }}
+          *.deb
+        key: ${{ runner.os }}-openssl-${{ hashFiles('*.deb') }}
         restore-keys: |
           ${{ runner.os }}-openssl-
 
@@ -30,24 +29,21 @@ jobs:
 
     - name: Download and Install the latest OpenSSL
       run: |
-        # Add logic to check if cached OpenSSL exists
-        LATEST_VERSION=$(wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1.1.1f-1ubuntu2.\K\d+' | sort -Vr | head -n 1)
+        # Extract the latest version number
+        VERSION=$(wget -qO- http://security.ubuntu.com/ubuntu/pool/main/o/openssl/ | grep -oP 'openssl_1.1.1f-1ubuntu2.\K\d+' | sort -V | tail -n 1)
 
-        # Construct download URLs
-        OPENSSL_URL="http://security.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb"
-        LIBSSL_DEV_URL="http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl-dev_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb"
-        LIBSSL_URL="http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb"
-
-        # Download and install the packages
-        wget $OPENSSL_URL
-        wget $LIBSSL_DEV_URL
-        wget $LIBSSL_URL
-        sudo dpkg -i openssl_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb libssl-dev_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb libssl1.1_1.1.1f-1ubuntu2.${LATEST_VERSION}_amd64.deb
+        # Check if cached .deb files exist, if not download them
+        if [ ! -f "openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb" ]; then
+            wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb
+        fi
+        if [ ! -f "libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb" ]; then
+            wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb
+        fi
+        if [ ! -f "libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb" ]; then
+            wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb
+        fi
+        sudo dpkg -i openssl_1.1.1f-1ubuntu2.$VERSION_amd64.deb libssl-dev_1.1.1f-1ubuntu2.$VERSION_amd64.deb libssl1.1_1.1.1f-1ubuntu2.$VERSION_amd64.deb
 
     - name: Compile zsign
       run: |
         g++ *.cpp common/*.cpp -std=gnu++11 -lcrypto -O3 -o zsign
-
-
-
-
