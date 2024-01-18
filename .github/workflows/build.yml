@@ -26,7 +26,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y zip unzip build-essential checkinstall zlib1g-dev wget g++ cmake make checkinstall zlib1g-dev
-        sudo apt-get install libssl-dev
+        sudo apt-get install libssl-dev pkg-config
 
     - name: Download and Install the latest OpenSSL
       run: |
@@ -54,13 +54,21 @@ jobs:
         if [ ! -f "$OPENSSL_DEB" ]; then
             wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/$OPENSSL_DEB"
         fi
+        if [ ! -f "$LIBSSL_DEV_DEB" ]; then
+            wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/$LIBSSL_DEV_DEB"
+        fi
         if [ ! -f "$LIBSSL_DEB" ]; then
             wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/$LIBSSL_DEB"
         fi
     
         # Install the packages
-        sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-confnew $OPENSSL_DEB $LIBSSL_DEB
+        sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-confnew $OPENSSL_DEB $LIBSSL_DEV_DEB $LIBSSL_DEB
+        
 
-    - name: Compile zsign
+    - name: Clone and Install OpenSSL
       run: |
-        g++ *.cpp common/*.cpp -lcrypto -O3 -o zsign
+        git clone https://github.com/openssl/openssl.git
+        cd openssl
+        ./config
+        make
+        sudo make install
