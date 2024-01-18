@@ -54,9 +54,6 @@ jobs:
         if [ ! -f "$OPENSSL_DEB" ]; then
             wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/$OPENSSL_DEB"
         fi
-        if [ ! -f "$LIBSSL_DEV_DEB" ]; then
-            wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/$LIBSSL_DEV_DEB"
-        fi
         if [ ! -f "$LIBSSL_DEB" ]; then
             wget "http://security.ubuntu.com/ubuntu/pool/main/o/openssl/$LIBSSL_DEB"
         fi
